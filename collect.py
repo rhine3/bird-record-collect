@@ -156,7 +156,7 @@ def url_and_species_from_email(path_to_email):
     assert(true_count_dict == desired_count_dict)
     return reports
 
-if __name___ == __main__:
+if '__name___' == '__main__':
     paths_to_emails = list(Path().glob("**/*.eml"))
 
     # Get URLs and species from the email
@@ -177,5 +177,5 @@ if __name___ == __main__:
         df = df.append(record.get_row(), ignore_index=True)
 
     # Save this information
-    early_date, late_date = get_dates(emails)
-    df.to_csv(f"records_{early_date}-{late_date}.csv")
+    early_date, late_date = get_dates(paths_to_emails)
+    df.to_csv(f"records_{early_date.date()}_{late_date.date()}.csv", index=False)
