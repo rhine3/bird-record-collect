@@ -156,7 +156,7 @@ def url_and_species_from_email(path_to_email):
     assert(true_count_dict == desired_count_dict)
     return reports
 
-if '__name___' == '__main__':
+if __name__ == '__main__':
     paths_to_emails = list(Path().glob("**/*.eml"))
 
     # Get URLs and species from the email
