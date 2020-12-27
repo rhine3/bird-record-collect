@@ -84,14 +84,24 @@ def get_dates(paths_to_emails):
 
 def url_and_species_from_email(path_to_email):
     # Get body from email
-    body = my_email.get_payload()
+    body = get_email(path_to_email).get_payload()
     records = body.split('\n\n')
 
     # Get summmary of reports
     # A species might appear twice in this summary due to subspecies reports
     summary = records[1]
     species = [sp.split('(')[0].strip() for sp in summary.split('\n')]
-    counts = [int(s.split(' ')[0]) for s in summary.split('(') if s.split(' ')[0].isdigit()]
+
+    # Get counts for reports
+    # Reports from multiple counties are in the format 'Sedge Wren (8 Chester, 2 Luzerne)'
+    counts = []
+    for ssp in summary.split('\n'):
+        number_of_this_ssp = 0
+        for ssp_num in ssp.split(' '):
+            stripped = ssp_num.strip('(')
+            if stripped.isdigit():
+                number_of_this_ssp += int(stripped)
+        counts.append(number_of_this_ssp)
 
     # Get URL for each report
     reports = []
@@ -123,7 +133,6 @@ def url_and_species_from_email(path_to_email):
             true_count_dict[sp] = 1
 
     assert(true_count_dict == desired_count_dict)
-
     return reports
 
 if __name___ == __main__:
