@@ -4,7 +4,9 @@ import time
 import numpy as np
 from datetime import datetime
 import email
+import re
 import requests
+from bs4 import BeautifulSoup
 
 class eBirdRecord():
     def __init__(self, url, species):
@@ -13,36 +15,54 @@ class eBirdRecord():
         self.species = species
         self.url = url
         self.html = self.set_html()
+        self.record = self.set_record()
         self.individuals = self.set_individuals()
         self.county = self.set_county()
         self.hotspot = self.set_hotspot()
         self.date = self.set_date()
-        self.observers = self.set_observers()
-        self.media = self.set_media()
+        self.submitter = self.set_submitter()
+        self.has_media = self.set_has_media()
 
     def __repr__(self):
-        return f"eBirdRecord({self.url}, {self.species})"
+        return f"eBirdRecord('{self.url}', '{self.species}')"
+
+    def set_record(self):
+        results = self.html.find_all('li')
+        for result in results:
+            birds = result.find_all('span', {'class':'Heading-main'})
+            for bird in birds:
+                if bird.contents[0] == self.species:
+                    record = result.contents
+        return record
 
     def set_html(self):
-        pass
+        r = requests.get(self.url)
+        return BeautifulSoup(r.text, features="lxml")
 
     def set_individuals(self):
-        pass
+        # Number observed
+        return self.record[1].find('div', {'class':"Observation-numberObserved"}).contents[1].contents[3].contents[0]
 
     def set_county(self):
-        pass
+        return self.html.find_all('a', {"title":re.compile("^Region page for.*County")})[0].contents[0]
 
     def set_hotspot(self):
-        pass
+        # Searching for "a" because hotspots have links
+        location = self.html.find_all('div', {"class":"Heading Heading--h3 u-margin-none"})[0].find('a')
+        if location != None:
+            return location['href']
+        else:
+            return None
 
     def set_date(self):
-        pass
+        string = self.html.title.contents[0].split('-')[1].strip()
+        return datetime.strptime(string, "%d %b %Y")
 
-    def set_observers(self):
-        pass
+    def set_submitter(self):
+        return self.html.find_all("meta", {"name":"author"})[0]["content"]
 
-    def set_media(self):
-        pass
+    def set_has_media(self):
+        return self.record[1].find("div", {"data-media-commonname":self.species}) != None
 
     def get_row(self):
         return {
@@ -52,7 +72,8 @@ class eBirdRecord():
             "county" : self.county,
             "hotspot" : self.hotspot,
             "date" : self.date,
-            "observers" : self.observers,
+            "submitter" : self.submitter,
+            "has_media" : self.has_media,
         }
 
 def get_email(path_to_email):
