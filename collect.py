@@ -211,4 +211,9 @@ if __name__ == '__main__':
 
     # Save this information
     early_date, late_date = get_dates(paths_to_emails)
-    df.to_csv(f"records_{early_date.date()}_{late_date.date()}.csv", index=False)
+    #df.to_csv(f"records_{early_date.date()}_{late_date.date()}.csv", index=False)
+
+    df['has_media'].fillna(False, inplace=True)
+    df = df[df['has_media']]
+    df = records.sort_values(["species", "hotspot"])
+    df.to_csv(f"sorted_records_{early_date.date()}_{late_date.date()}.csv", index=False)
