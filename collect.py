@@ -15,19 +15,36 @@ class eBirdRecord():
         self.species = species
         self.url = url
         self.html = self.set_html()
-        self.record = self.set_record()
-        self.individuals = self.set_individuals()
-        self.county = self.set_county()
-        self.hotspot = self.set_hotspot()
-        self.date = self.set_date()
-        self.submitter = self.set_submitter()
-        self.has_media = self.set_has_media()
+        if self.html == None:
+            self.record = None
+            self.individuals = None
+            self.county = None
+            self.hotspot = None
+            self.date = None
+            self.submitter = None
+            self.has_media = None
+        else:
+            self.record = self.set_record()
+            self.individuals = self.set_individuals()
+            self.county = self.set_county()
+            self.hotspot = self.set_hotspot()
+            self.date = self.set_date()
+            self.submitter = self.set_submitter()
+            self.has_media = self.set_has_media()
 
     def __repr__(self):
         return f"eBirdRecord('{self.url}', '{self.species}')"
 
+    def set_html(self):
+        r = requests.get(self.url)
+        # Handle deleted checklists
+        if r.status_code == 400:
+            return None
+        return BeautifulSoup(r.text, features="lxml")
+
     def set_record(self):
         results = self.html.find_all('li')
+        record = None
         for result in results:
             birds = result.find_all('span', {'class':'Heading-main'})
             for bird in birds:
@@ -35,11 +52,9 @@ class eBirdRecord():
                     record = result.contents
         return record
 
-    def set_html(self):
-        r = requests.get(self.url)
-        return BeautifulSoup(r.text, features="lxml")
-
     def set_individuals(self):
+        if self.record == None:
+            return None
         # Number observed
         return self.record[1].find('div', {'class':"Observation-numberObserved"}).contents[1].contents[3].contents[0]
 
@@ -62,6 +77,8 @@ class eBirdRecord():
         return self.html.find_all("meta", {"name":"author"})[0]["content"]
 
     def set_has_media(self):
+        if self.record == None:
+            return None
         return self.record[1].find("div", {"data-media-commonname":self.species}) != None
 
     def get_row(self):
