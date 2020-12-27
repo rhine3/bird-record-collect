@@ -185,11 +185,27 @@ if __name__ == '__main__':
     # Create list of eBirdRecords
     records = []
     for url_and_species in urls_and_species:
-        url, species = url_and_species
+        try:
+            url, species = url_and_species
+        except:
+            print(url, species)
         records.append(eBirdRecord(url, species))
 
     # Make dataframe of info about records
-    df = pd.DataFrame()
+    df = pd.DataFrame(
+        {
+            'species': pd.Series([], dtype='str'),
+            'url': pd.Series([], dtype='str'),
+            'individuals': pd.Series([], dtype='int'),
+            'county': pd.Series([], dtype='str'),
+            'hotspot': pd.Series([], dtype='str'),
+            'date': pd.Series([], dtype='str'),
+            'submitter': pd.Series([], dtype='str'),
+            'has_media': pd.Series([], dtype='bool'),
+        }
+    )
+
+
     for record in records:
         df = df.append(record.get_row(), ignore_index=True)
 
