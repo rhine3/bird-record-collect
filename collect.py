@@ -1,15 +1,14 @@
 import pandas as pd
 from pathlib import Path
-
 import time
 import numpy as np
 from datetime import datetime
-
 import email
-from email.message import get_body
+import requests
 
 class eBirdRecord():
     def __init__(self, url, species):
+        assert(url[:4] == "http")
         # Get text from url
         self.species = species
         self.url = url
@@ -19,6 +18,10 @@ class eBirdRecord():
         self.hotspot = self.set_hotspot()
         self.date = self.set_date()
         self.observers = self.set_observers()
+        self.media = self.set_media()
+
+    def __repr__(self):
+        return f"eBirdRecord({self.url}, {self.species})"
 
     def set_html(self):
         pass
@@ -36,6 +39,9 @@ class eBirdRecord():
         pass
 
     def set_observers(self):
+        pass
+
+    def set_media(self):
         pass
 
     def get_row(self):
