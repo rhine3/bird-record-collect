@@ -2,7 +2,7 @@
 This code helps you collect data from eBird Needs Alerts into a table. This code is in use by the [Pennsylvania Ornithological Records Committee](https://pabirds.org/records).
 
 # Create needs alert
-To use the code, set up an eBird needs alert. In our case, we set up an eBird account with one historical checklist containing all of the regular (non-review species) in Pennsylvania. Then we set up the account to send daily emails containing life needs alerts for the state of Pennsylvania. This effectively emails us any records of any state-level review list species. 
+To use the code, set up an eBird needs alert. In our case, we set up an eBird account with one historical checklist containing all of the regular (non-review species) in Pennsylvania. Then we set up the account to send daily emails containing life needs alerts for the state of Pennsylvania. This effectively emails us any records of any state-level review list species.
 
 # Download emails
 Download the emails in .eml format. In Gmail, this can be accomplished with the following steps.
@@ -15,5 +15,14 @@ Download the emails in .eml format. In Gmail, this can be accomplished with the 
 # Assess emails using script
 Clone this repository. Create a folder within the repository and move the attached emails into the folder. Then, assess the emails by typing the following into the terminal:
 ```
-python collect.py name_of_folder
+python collect.py
 ```
+The program will prompt you to type the name of the folder. Type it exactly and press enter. Then, the program will collect the URLs from the emails, extract information from each URL, and print its progress as it goes. Once it is done collecting these data, it will save the data to a .CSV. The data collected currently are:
+* `species`: the species
+* `url`: the url of the eBird checklist
+* `individuals`: the number of individuals reported on the checklist
+* `county`: the county from which the observation was submitted
+* `hotspot`: the hotspot from which the observation was submitted, if any
+* `date`: the observation date of the checklist
+* `submitter`: the eBird display name of the person submitting the checklist
+* `has_media`: whether the species observation has media associated with it.
