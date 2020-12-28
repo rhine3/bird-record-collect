@@ -174,7 +174,13 @@ def url_and_species_from_email(path_to_email):
     return reports
 
 if __name__ == '__main__':
-    paths_to_emails = list(Path().glob("**/*.eml"))
+    folder = input("Type name of folder: ")
+    if not Path(folder).exists():
+        print("Folder not found. Exiting.")
+        exit()
+
+    paths_to_emails = list(Path(folder).glob("**/*.eml"))
+    print(f"Assessing {len(paths_to_emails)} emails from {folder}")
 
     # Get URLs and species from the email
     urls_and_species = []
@@ -187,9 +193,12 @@ if __name__ == '__main__':
     for url_and_species in urls_and_species:
         try:
             url, species = url_and_species
+            records.append(eBirdRecord(url, species))
         except:
-            print(url, species)
-        records.append(eBirdRecord(url, species))
+            print("Error assessing record:", url, species)
+        else:
+            print("Assessed", url, species)
+
 
     # Make dataframe of info about records
     df = pd.DataFrame(
