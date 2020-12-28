@@ -17,7 +17,9 @@ Clone this repository. Create a folder within the repository and move the attach
 ```
 python collect.py
 ```
-The program will prompt you to type the name of the folder. Type it exactly and press enter. Then, the program will collect the URLs from the emails, extract information from each URL, and print its progress as it goes. Once it is done collecting these data, it will save the data to a .CSV. The data collected currently are:
+The program will prompt you to type the name of the folder. Type it exactly and press enter. Then, the program will collect the URLs from the emails, extract information from each URL, and print its progress as it goes. Once it is done collecting these data, it will save the data to a .CSV named with the date of the first email assessed and the date of the last email assessed, e.g., `records_2020-10-28_2020-11-11.csv`.
+
+The columns of the CSV are:
 * `species`: the species
 * `url`: the url of the eBird checklist
 * `individuals`: the number of individuals reported on the checklist
