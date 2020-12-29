@@ -200,21 +200,24 @@ if __name__ == '__main__':
     elif save_path[-4:] != '.csv':
         save_path += '.csv'
         save_path = Path(save_path)
-
-    print()
     print(f"Saving results to {save_path}")
+
+    # Decide what to do when spreadsheet by the chosen name already exists
     if save_path.exists():
+        print()
         print(f"File {str(save_path)} already exists.")
         delete = input("Overwrite (o), exit without analyzing files (e), or append new records to file (a)? ")
         while delete.lower() not in ['o', 'e', 'a']:
-            delete = input('Type "o" to overwrite file, "e" to exit, or "a" to append new records to file: ')
+            delete = input('  Type "o" to overwrite file, "e" to exit, or "a" to append new records to file: ')
         if delete.lower() == 'o':
             print("Deleting.")
             save_path.unlink()
         elif delete.lower() == 'a':
             original_df = pd.read_csv(save_path)
             original_urls_and_species = list(zip(original_df['url'],original_df['species']))
-            urls_and_species = list(set(urls_and_species) - set(original_urls_and_species))
+            overlap = set(urls_and_species).intersection(set(original_urls_and_species))
+            urls_and_species = list(set(urls_and_species) - overlap)
+            print(f"Skipping {len(overlap)} records that are already in {str(save_path)}")
         else:
             print("Exiting.")
             exit()
@@ -222,16 +225,32 @@ if __name__ == '__main__':
 
     # Assess each record and save it to file
     print()
-    print(f"Assessing {len(urls_and_species)} records")
+    print(f"Assessing {len(urls_and_species)} new records")
     for idx, url_and_species in enumerate(urls_and_species):
         url, species = url_and_species
+        print(f"{idx+1} Assessing {url} - {species}")
         record = eBirdRecord(url, species).get_row()
         if save_path.exists():
             record.to_csv(save_path, header=None, mode="a", index=False)
         else:
             record.to_csv(save_path, index=False)
-        print(f"{idx+1} Assessed {url} - {species}")
+    print("Done collecting records.")
 
+    # Sort and organize records
+    records = pd.read_csv(save_path)
+    records = records[records['has_media']]
+    records = records.sort_values(["species", "hotspot", "date"]).reset_index(drop=True)
+    records.to_csv(save_path, index=False)
+    print("Sorted records by species, hotspot, and date.")
+    print(f"Records are now saved in {save_path}")
 
-    #df = df[df['has_media']]
-    #df = df.sort_values(["species", "hotspot"])
+    # Give option to save new file of records without media
+    print()
+    delete_without_media = input("Save a version of spreadsheet only containing records with media? (y/n) ")
+    while delete_without_media.lower() not in ['y', 'n']:
+            delete_without_media = input('  Type "y" to create a new spreadsheet only containing records with media or "n" to exit: ')
+    if delete_without_media.lower() == 'y':
+        records = records[records['has_media']]
+        new_save_path = 'has_media_' + str(save_path)
+        records.reset_index(drop=True).to_csv(new_save_path, index=False)
+        print(f"Records containing media saved to {new_save_path}")
