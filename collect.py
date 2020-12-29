@@ -224,5 +224,5 @@ if __name__ == '__main__':
 
     df['has_media'].fillna(False, inplace=True)
     df = df[df['has_media']]
-    df = records.sort_values(["species", "hotspot"])
+    df = df.sort_values(["species", "hotspot"])
     df.to_csv(f"sorted_records_{early_date.date()}_{late_date.date()}.csv", index=False)
