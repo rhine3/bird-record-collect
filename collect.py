@@ -70,8 +70,8 @@ class eBirdRecord():
             return np.nan
 
     def set_date(self):
-        string = self.html.title.contents[0].split('-')[1].strip()
-        return datetime.strptime(string, "%d %b %Y")
+        string = self.html.find_all("span", {"class":"Heading-main"})[0].contents[-1].strip()
+        return datetime.strptime(string, "%d %b %Y").date()
 
     def set_submitter(self):
         return self.html.find_all("meta", {"name":"author"})[0]["content"]
