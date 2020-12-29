@@ -54,7 +54,7 @@ class eBirdRecord():
 
     def set_individuals(self):
         if self.record == None:
-            return None
+            return np.nan
         # Number observed
         return self.record[1].find('div', {'class':"Observation-numberObserved"}).contents[1].contents[3].contents[0]
 
@@ -67,7 +67,7 @@ class eBirdRecord():
         if location != None:
             return location['href']
         else:
-            return None
+            return np.nan
 
     def set_date(self):
         string = self.html.title.contents[0].split('-')[1].strip()
@@ -78,20 +78,22 @@ class eBirdRecord():
 
     def set_has_media(self):
         if self.record == None:
-            return None
+            return False
         return self.record[1].find("div", {"data-media-commonname":self.species}) != None
 
     def get_row(self):
-        return {
-            "species" : self.species,
-            "url": self.url,
-            "individuals" : self.individuals,
-            "county" : self.county,
-            "hotspot" : self.hotspot,
-            "date" : self.date,
-            "submitter" : self.submitter,
-            "has_media" : self.has_media,
-        }
+        return pd.DataFrame(
+            {
+                "species" : pd.Series([self.species], dtype='str'),
+                "url": pd.Series([self.url], dtype='str'),
+                "individuals" : pd.Series([self.individuals], dtype='str'),
+                "county" : pd.Series([self.county], dtype='str'),
+                "hotspot" : pd.Series([self.hotspot], dtype='str'),
+                "date" : pd.Series([self.date], dtype='str'),
+                "submitter" : pd.Series([self.submitter], dtype='str'),
+                "has_media" : pd.Series([self.has_media], dtype='bool'),
+            },
+        )
 
 def get_email(path_to_email):
     """Return email.Message
