@@ -176,7 +176,7 @@ def url_and_species_from_email(path_to_email):
     return reports
 
 if __name__ == '__main__':
-    folder = input("Type name of folder: ")
+    folder = input("Type name of folder containing emails: ")
     if not Path(folder).exists():
         print("Folder not found. Exiting.")
         exit()
@@ -189,42 +189,49 @@ if __name__ == '__main__':
     for path_to_email in paths_to_emails:
         email_pairs = url_and_species_from_email(path_to_email)
         urls_and_species.extend(email_pairs)
+    urls_and_species = list(set(urls_and_species))
 
-    # Create list of eBirdRecords
-    records = []
-    for url_and_species in urls_and_species:
-        try:
-            url, species = url_and_species
-            records.append(eBirdRecord(url, species))
-        except:
-            print("Error assessing record:", url, species)
+    # Create filename
+    print()
+    save_path = input("Type name of results csv, or press Enter to use default filename: ")
+    if not save_path:
+        early_date, late_date = get_dates(paths_to_emails)
+        save_path = Path(f"records_{early_date.date()}_{late_date.date()}.csv")
+    elif save_path[-4:] != '.csv':
+        save_path += '.csv'
+        save_path = Path(save_path)
+
+    print()
+    print(f"Saving results to {save_path}")
+    if save_path.exists():
+        print(f"File {str(save_path)} already exists.")
+        delete = input("Overwrite (o), exit without analyzing files (e), or append new records to file (a)? ")
+        while delete.lower() not in ['o', 'e', 'a']:
+            delete = input('Type "o" to overwrite file, "e" to exit, or "a" to append new records to file: ')
+        if delete.lower() == 'o':
+            print("Deleting.")
+            save_path.unlink()
+        elif delete.lower() == 'a':
+            original_df = pd.read_csv(save_path)
+            original_urls_and_species = list(zip(original_df['url'],original_df['species']))
+            urls_and_species = list(set(urls_and_species) - set(original_urls_and_species))
         else:
-            print("Assessed", url, species)
+            print("Exiting.")
+            exit()
 
 
-    # Make dataframe of info about records
-    df = pd.DataFrame(
-        {
-            'species': pd.Series([], dtype='str'),
-            'url': pd.Series([], dtype='str'),
-            'individuals': pd.Series([], dtype='int'),
-            'county': pd.Series([], dtype='str'),
-            'hotspot': pd.Series([], dtype='str'),
-            'date': pd.Series([], dtype='str'),
-            'submitter': pd.Series([], dtype='str'),
-            'has_media': pd.Series([], dtype='bool'),
-        }
-    )
+    # Assess each record and save it to file
+    print()
+    print(f"Assessing {len(urls_and_species)} records")
+    for idx, url_and_species in enumerate(urls_and_species):
+        url, species = url_and_species
+        record = eBirdRecord(url, species).get_row()
+        if save_path.exists():
+            record.to_csv(save_path, header=None, mode="a", index=False)
+        else:
+            record.to_csv(save_path, index=False)
+        print(f"{idx+1} Assessed {url} - {species}")
 
 
-    for record in records:
-        df = df.append(record.get_row(), ignore_index=True)
-
-    # Save this information
-    early_date, late_date = get_dates(paths_to_emails)
-    #df.to_csv(f"records_{early_date.date()}_{late_date.date()}.csv", index=False)
-
-    df['has_media'].fillna(False, inplace=True)
-    df = df[df['has_media']]
-    df = df.sort_values(["species", "hotspot"])
-    df.to_csv(f"sorted_records_{early_date.date()}_{late_date.date()}.csv", index=False)
+    #df = df[df['has_media']]
+    #df = df.sort_values(["species", "hotspot"])
