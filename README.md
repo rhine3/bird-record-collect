@@ -12,14 +12,24 @@ Download the emails in .eml format. In Gmail, this can be accomplished with the 
 4. Forward to yourself
 5. Download the attached emails.
 
-# Assess emails using script
-Clone this repository. Create a folder within the repository and move the attached emails into the folder. Then, assess the emails by typing the following into the terminal:
+# Collect records into one file: `collect.py`
+Clone this repository. Create a folder within the repository and move the attached emails into the folder. Assess the emails by typing the following into the terminal:
 ```
 python collect.py
 ```
-The program will prompt you to type the name of the folder. Type it exactly and press enter. Then, the program will collect the URLs from the emails, extract information from each URL, and print its progress as it goes. Once it is done collecting these data, it will save the data to a .CSV named with the date of the first email assessed and the date of the last email assessed, e.g., `records_2020-10-28_2020-11-11.csv`.
 
-The columns of the CSV are:
+The program will prompt you for some information:
+* The name of the folder. Type it exactly and press Enter. If the folder does not exist, the program will exit.
+* What you want to name the spreadsheet.
+  * If you press Enter without typing anything, the program will save the data to a CSV named with the send date of the first email assessed and the send date of the last email assessed, e.g., `records_2020-10-28_2020-11-11.csv`.
+* If you select a name of a spreadsheet that already exists, you will be prompted to select one of the following options. Type the letter and press enter to select the optiono:
+  * 'o': Overwrite previous spreadsheet. Deletes old spreadsheet and creates a new one.
+  * 'e': Exit without analyzing any emails or changing anything about the old spreadsheet.
+  * 'a': Append new records. Searches through the pre-existing spreadsheet and analyzes any records in the emails that that haven't been assessed yet. This option is helpful if the script exits while assessing files.
+
+### Results of `collect.py`
+The program will collect the URLs from the emails, extract information from each URL, and print its progress as it goes. Once it is done collecting these data, it will sort the results by species, hotspot, and date, and finally save them to a CSV. The columns of the CSV are:
+
 * `species`: the species
 * `url`: the url of the eBird checklist
 * `individuals`: the number of individuals reported on the checklist
@@ -28,3 +38,5 @@ The columns of the CSV are:
 * `date`: the observation date of the checklist
 * `submitter`: the eBird display name of the person submitting the checklist
 * `has_media`: whether the species observation has media associated with it.
+
+You will have the option to save a copy of the CSV that contains only the records that had media associated with them. Type "y" and press Enter when prompted.
