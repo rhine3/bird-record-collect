@@ -17,12 +17,13 @@ class eBirdRecord():
         self.html = self.set_html()
         if self.html == None:
             self.record = None
-            self.individuals = None
+            self.individuals = np.nan
             self.county = None
             self.hotspot = None
             self.date = None
             self.submitter = None
             self.has_media = None
+            self.media_confirmed = None
         else:
             self.record = self.set_record()
             self.individuals = self.set_individuals()
@@ -31,6 +32,7 @@ class eBirdRecord():
             self.date = self.set_date()
             self.submitter = self.set_submitter()
             self.has_media = self.set_has_media()
+            self.media_confirmed = self.set_media_confirmed()
 
     def __repr__(self):
         return f"eBirdRecord('{self.url}', '{self.species}')"
@@ -40,7 +42,7 @@ class eBirdRecord():
         # Handle deleted checklists
         if r.status_code == 400:
             return None
-        return BeautifulSoup(r.text, features="lxml")
+        return BeautifulSoup(r.text, features="html.parser")
 
     def set_record(self):
         results = self.html.find_all('li')
@@ -81,6 +83,21 @@ class eBirdRecord():
             return False
         return self.record[1].find("div", {"data-media-commonname":self.species}) != None
 
+    def set_media_confirmed(self):
+        if self.record == None:
+            return False
+        else:
+            # Check the ML page for the first media to see if it's confirmed
+            # (eBird checklists no longer show confirmation)
+            asset_url = "https://macaulaylibrary.org/asset/" + self.record[1].find('div', {"data-media-commonname":self.species})['data-media-id']
+            r = requests.get(asset_url)
+            if r.status_code == 400:
+                return False
+            if BeautifulSoup(r.text, features='html.parser').find("span", {"title":"Unconfirmed"}):
+                return False
+            else:
+                return True
+    
     def get_row(self):
         return pd.DataFrame(
             {
@@ -92,6 +109,7 @@ class eBirdRecord():
                 "date" : pd.Series([self.date], dtype='str'),
                 "submitter" : pd.Series([self.submitter], dtype='str'),
                 "has_media" : pd.Series([self.has_media], dtype='bool'),
+                "media_confirmed" : pd.Series([self.media_confirmed], dtype='bool'),
             },
         )
 
@@ -237,11 +255,11 @@ if __name__ == '__main__':
     print("Done collecting records.")
 
     # Sort and organize records
-    records = pd.read_csv(save_path)
+    records = pd.read_csv(save_path, parse_dates=['date'])
     records = records[records['has_media']]
-    records = records.sort_values(["species", "hotspot", "date"]).reset_index(drop=True)
+    records = records.sort_values(["species", "county", "hotspot", "date"]).reset_index(drop=True)
     records.to_csv(save_path, index=False)
-    print("Sorted records by species, hotspot, and date.")
+    print("Sorted records by species, county, hotspot, and date.")
     print(f"Records are now saved in {save_path}")
 
     # Give option to save new file of records without media
