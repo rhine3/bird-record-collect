@@ -263,11 +263,11 @@ if __name__ == '__main__':
 
     # Give option to save new file of records without media
     print()
-    delete_without_media = input("Save a version of spreadsheet only containing records with media? (y/n) ")
+    delete_without_media = input("Save a version of spreadsheet only containing records with confirmed media? (y/n) ")
     while delete_without_media.lower() not in ['y', 'n']:
             delete_without_media = input('  Type "y" to create a new spreadsheet only containing records with media or "n" to exit: ')
     if delete_without_media.lower() == 'y':
-        records = records[records['has_media']]
+        records = records[records['media_confirmed']]
         new_save_path = 'has_media_' + str(save_path)
         records.reset_index(drop=True).to_csv(new_save_path, index=False)
         print(f"Records containing media saved to {new_save_path}")
