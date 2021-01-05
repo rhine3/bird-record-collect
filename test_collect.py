@@ -17,7 +17,7 @@ def test_eBirdRecord_unconfirmed_photo(eBirdRecordToDict):
     url="https://ebird.org/checklist/S45704143"
     species="Razorbill"
     output_dict = eBirdRecordToDict(url=url, species=species)
-    
+
     true_dict = {
         'species': species,
         'url': url,
@@ -29,14 +29,14 @@ def test_eBirdRecord_unconfirmed_photo(eBirdRecordToDict):
         'has_media': True,
         'media_confirmed': False
     }
-    
+
     assert output_dict == true_dict
-    
+
 def test_eBirdRecord_confirmed_photo(eBirdRecordToDict):
     url="https://ebird.org/checklist/S78396122"
     species="Hoary Redpoll"
     output_dict = eBirdRecordToDict(url=url, species=species)
-    
+
     true_dict = {
         'species': species,
         'url': url,
@@ -48,15 +48,15 @@ def test_eBirdRecord_confirmed_photo(eBirdRecordToDict):
         'has_media': True,
         'media_confirmed': True,
     }
-    
+
     assert output_dict == true_dict
-    
-    
+
+
 def test_eBirdRecord_unconfirmed_audio(eBirdRecordToDict):
     url = 'https://ebird.org/checklist/S45603323'
     species = 'Yellow-bellied Flycatcher'
     output_dict = eBirdRecordToDict(url=url, species=species)
-    
+
     true_dict = {
         'species': species,
         'url': url,
@@ -68,14 +68,14 @@ def test_eBirdRecord_unconfirmed_audio(eBirdRecordToDict):
         'has_media': True,
         'media_confirmed': False,
     }
-    
+
     assert output_dict == true_dict
 
 def test_eBirdRecord_confirmed_audio(eBirdRecordToDict):
     url = 'https://ebird.org/checklist/S75375206'
     species = 'American Robin'
     output_dict = eBirdRecordToDict(url=url, species=species)
-    
+
     true_dict = {
         'species': species,
         'url': url,
@@ -87,14 +87,14 @@ def test_eBirdRecord_confirmed_audio(eBirdRecordToDict):
         'has_media': True,
         'media_confirmed': True
     }
-    
+
     assert output_dict == true_dict
-    
+
 def test_eBirdRecord_bad_url(eBirdRecordToDict):
     bad_url = "https://ebird.org/checklist/S123456789123456789"
     species = "Razorbill"
     output_dict = eBirdRecordToDict(url=bad_url, species=species)
-    
+
     true_dict = {
         'species': species,
          'url': bad_url,
@@ -106,15 +106,15 @@ def test_eBirdRecord_bad_url(eBirdRecordToDict):
          'has_media': False,
          'media_confirmed': False,
     }
-    
+
     assert output_dict == true_dict
-    
+
 def test_eBirdRecord_bad_species(eBirdRecordToDict):
     url = "https://ebird.org/checklist/S78396122"
     bad_species = "Andean Cock-of-the-rock"
     output_dict = eBirdRecordToDict(url=url, species=bad_species)
-    
-    
+
+
     true_dict = {
         'species': bad_species,
         'url': url,
@@ -126,5 +126,25 @@ def test_eBirdRecord_bad_species(eBirdRecordToDict):
         'has_media': False,
         'media_confirmed': False,
     }
-    
+
+    assert output_dict == true_dict
+
+def test_eBirdRecord_species_has_no_media(eBirdRecordToDict):
+    url = 'https://ebird.org/checklist/S75350351'
+    species = 'Cattle Egret'
+    output_dict = eBirdRecordToDict(url=url, species=species)
+
+
+    true_dict = {
+        'species': species,
+        'url': url,
+        'individuals': '8',
+        'county': 'Dauphin County',
+        'hotspot': '/hotspot/L833038',
+        'date': '2020-10-24',
+        'submitter': 'ramsay koury',
+        'has_media': False,
+        'media_confirmed': False,
+    }
+
     assert output_dict == true_dict
