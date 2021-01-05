@@ -84,7 +84,7 @@ class eBirdRecord():
         return self.record[1].find("div", {"data-media-commonname":self.species}) != None
 
     def set_media_confirmed(self):
-        if self.record == None:
+        if self.record == None or not self.set_has_media():
             return False
         else:
             # Check the ML page for the first media to see if it's confirmed
@@ -97,7 +97,7 @@ class eBirdRecord():
                 return False
             else:
                 return True
-    
+
     def get_row(self):
         return pd.DataFrame(
             {
