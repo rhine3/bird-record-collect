@@ -256,7 +256,6 @@ if __name__ == '__main__':
 
     # Sort and organize records
     records = pd.read_csv(save_path, parse_dates=['date'])
-    records = records[records['has_media']]
     records = records.sort_values(["species", "county", "hotspot", "date"]).reset_index(drop=True)
     records.to_csv(save_path, index=False)
     print("Sorted records by species, county, hotspot, and date.")
